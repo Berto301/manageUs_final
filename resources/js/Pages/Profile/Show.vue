@@ -12,12 +12,13 @@ defineProps({
     confirmsTwoFactorAuthentication: Boolean,
     sessions: Array,
     user:Object,
-    group:Object
+    group:Object,
+    notifications:Array
 });
 </script>
 
 <template>
-    <AppLayout title="Profile" :user="user">
+    <AppLayout title="Profile" :user="user" :notifications="props?.notifications">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Profile

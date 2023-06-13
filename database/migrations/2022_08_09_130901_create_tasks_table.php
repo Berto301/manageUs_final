@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('team_id');
             $table->unsignedBigInteger('creator_id');
-
+            $table->unsignedBigInteger('group_id');
             $table->string('title');
             $table->string('description')->nullable();
             $table->timestamp('due_date')->nullable();

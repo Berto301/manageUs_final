@@ -13,12 +13,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('teams', function (Blueprint $table) {
+        Schema::create('events', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->index();
-            $table->foreignId('group_id')->index();
-            $table->string('name');
-            $table->boolean('personal_team');
+            $table->foreignId('group_id');
+            $table->string('title');  
+            $table->string('description');  
+            $table->string('type');  
+            $table->date('start');  
+            $table->date('end');
+            $table->boolean('allDay')->default(false);
             $table->timestamps();
         });
     }
@@ -30,6 +33,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('teams');
+        Schema::dropIfExists('events');
     }
 };

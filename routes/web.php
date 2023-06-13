@@ -45,4 +45,8 @@ Route::middleware([
     Route::patch('/tasks/{task}', 'TaskController@patchTask')->name('task_patch');
     Route::delete('/tasks/{task}', 'TaskController@deleteTask')->name('task_delete');
     Route::post('/image/upload', 'ImageController@upload')->name('image.upload');
+    Route::get('/events', 'EventController@events')->name('events');
+    Route::post('/events', 'EventController@create')->name('event_create');
+    Route::patch('/events', 'EventController@update')->name('event_update');
+    Route::delete('/events', 'EventController@delete')->name('event_delete');
 });

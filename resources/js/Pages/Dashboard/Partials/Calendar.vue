@@ -1,118 +1,56 @@
 <script>
-import { defineComponent } from 'vue'
-import FullCalendar from '@fullcalendar/vue3'
-import dayGridPlugin from '@fullcalendar/daygrid'
-import timeGridPlugin from '@fullcalendar/timegrid'
-import interactionPlugin from '@fullcalendar/interaction'
-import { INITIAL_EVENTS, createEventId } from '../utils'
+import { defineComponent } from "vue";
+import {EVENTS_TYPES} from "../../../helpers/_constants"
 export default defineComponent({
-  components: {
-    FullCalendar,
+
+  props:{
+    events:Array
   },
   data() {
-    return {
-      calendarOptions: {
-        plugins: [
-          dayGridPlugin,
-          timeGridPlugin,
-          interactionPlugin // needed for dateClick
-        ],
-        headerToolbar: {
-          left: 'prev,next today',
-          center: 'title',
-          right: 'dayGridMonth,timeGridWeek,timeGridDay'
-        },
-        initialView: 'dayGridMonth',
-        initialEvents: INITIAL_EVENTS, // alternatively, use the `events` setting to fetch from a feed
-        editable: true,
-        selectable: true,
-        selectMirror: true,
-        dayMaxEvents: true,
-        weekends: true,
-        select: this.handleDateSelect,
-        eventClick: this.handleEventClick,
-        eventsSet: this.handleEvents
-        /* you can update a remote database when these fire:
-        eventAdd:
-        eventChange:
-        eventRemove:
-        */
-      },
-      currentEvents: [],
+    return{
+      eventTypes:EVENTS_TYPES
     }
-  },
-  methods: {
-    handleWeekendsToggle() {
-      this.calendarOptions.weekends = !this.calendarOptions.weekends // update a property
-    },
-    handleDateSelect(selectInfo) {
-      let title = prompt('Please enter a new title for your event')
-      let calendarApi = selectInfo.view.calendar
-      calendarApi.unselect() // clear date selection
-      if (title) {
-        calendarApi.addEvent({
-          id: createEventId(),
-          title,
-          start: selectInfo.startStr,
-          end: selectInfo.endStr,
-          allDay: selectInfo.allDay
-        })
-      }
-    },
-    handleEventClick(clickInfo) {
-      if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
-        clickInfo.event.remove()
-      }
-    },
-    handleEvents(events) {
-      this.currentEvents = events
-    },
   }
-})
+  
+});
 </script>
 
 <template>
-  <div class='demo-app'>
-    <div class='demo-app-sidebar'>
-      <div class='demo-app-sidebar-section'>
-        <h2>Instructions</h2>
-        <ul>
-          <li>Select dates and you will be prompted to create a new event</li>
-          <li>Drag, drop, and resize events</li>
-          <li>Click an event to delete it</li>
-        </ul>
+  <div
+    class="w-full border border-solid border-r-[#d3e2e8] border-y-0 border-l-0 bg-white p-12"
+  >
+    <div class="p-8">
+      <h2>Event for this month ({{ events.length }})</h2>
+      <div class="p-2 mb-2 bg-[#f3f5fb]" v-for="event in events" :key="event.id">
+              <div class="flex items-center">
+                  <div class="flex-shrink-0">
+                    <div :class="notify-icon" :style="`color: ${eventTypes.find(type => type.key === event.type)?.color};`">
+                          <i
+                              :class="`mdi ${eventTypes.find(type => type.key === event.type)?.icon}`"
+                          ></i>
+                      </div>
+                  </div>
+                  <div
+                      class="flex-grow-1 text-truncate ms-2"
+                  >
+                      <h5
+                          class="noti-item-title fw-semibold font-14"
+                          :style="`color: ${eventTypes.find(type => type.key === event.type)?.color};`"
+                      >
+                          {{ event?.title}}
+                          <!-- <small
+                              class="fw-normal text-muted ms-1"
+                              >{{ formatDistanceToNow(new Date(_notification?.created_at),{ addSuffix: true, locale: enGB }) }}</small
+                          > -->
+                      </h5>
+                      <small
+                          class="noti-item-subtitle text-muted "
+                          >{{event?.description}}</small
+                      >
+                  </div>
+              </div>
+          </div>
       </div>
-      <div class='demo-app-sidebar-section'>
-        <label>
-          <input
-            type='checkbox'
-            :checked='calendarOptions.weekends'
-            @change='handleWeekendsToggle'
-          />
-          toggle weekends
-        </label>
-      </div>
-      <div class='demo-app-sidebar-section'>
-        <h2>All Events ({{ currentEvents.length }})</h2>
-        <ul>
-          <li v-for='event in currentEvents' :key='event.id'>
-            <b>{{ event.startStr }}</b>
-            <i>{{ event.title }}</i>
-          </li>
-        </ul>
-      </div>
-    </div>
-    <div class='demo-app-main'>
-      <FullCalendar
-        class='demo-app-calendar'
-        :options='calendarOptions'
-      >
-        <template v-slot:eventContent='arg'>
-          <b>{{ arg.timeText }}</b>
-          <i>{{ arg.event.title }}</i>
-        </template>
-      </FullCalendar>
-    </div>
   </div>
 </template>
 
@@ -129,30 +67,9 @@ li {
   margin: 1.5em 0;
   padding: 0;
 }
-b { /* used for event dates/times */
+b {
+  /* used for event dates/times */
   margin-right: 3px;
 }
-.demo-app {
-  display: flex;
-  min-height: 100%;
-  font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
-  font-size: 14px;
-}
-.demo-app-sidebar {
-  width: 300px;
-  line-height: 1.5;
-  background: #eaf9ff;
-  border-right: 1px solid #d3e2e8;
-}
-.demo-app-sidebar-section {
-  padding: 2em;
-}
-.demo-app-main {
-  flex-grow: 1;
-  padding: 3em;
-}
-.fc { /* the calendar root */
-  max-width: 1100px;
-  margin: 0 auto;
-}
+
 </style>

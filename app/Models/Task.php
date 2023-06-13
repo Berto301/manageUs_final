@@ -20,7 +20,8 @@ class Task extends Model
     protected $casts = [
         'is_complete' => 'boolean',
         'team_id' => 'integer',
-        'creator_id' => 'integer'
+        'creator_id' => 'integer',
+        'group_id'=>'integer'
     ];
 
     public function creator()

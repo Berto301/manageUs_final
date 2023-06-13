@@ -6,15 +6,18 @@ const props = defineProps({
     //tasks: Array,
     user: Object,
     // teams:array
+    events:Array,
+    notifications:Array
 });
+
 
 
 </script>
 
 <template>
-<AppLayout title="Events" :user="props.user">
+<AppLayout title="Events" :user="props.user"  :notifications="props?.notifications" >
     <div class="mt-8">
-     <Calendar />
+     <Calendar :events="props?.events"/>
     </div>
 </AppLayout>
 </template>

@@ -8,6 +8,7 @@ import Item from './Partials/Item.vue';
 const props = defineProps({
     tasks: Array,
     user: Object,
+    notifications:Array
 });
 
 const state = reactive({
@@ -151,7 +152,7 @@ function deleteTask()
 </script>
 
 <template>
-<AppLayout title="Dashboard Custom Head" :user="props.user">
+<AppLayout title="Dashboard Custom Head" :user="props.user"  :notifications="props?.notifications">
   <div class="row">
     <div class="w-full">
          <!-- start page title -->

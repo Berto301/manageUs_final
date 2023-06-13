@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use App\Models\Notifications;
 
 class TaskController extends Controller
 {
@@ -15,21 +17,37 @@ class TaskController extends Controller
     {
        $user = Auth::user();
        $tasks =Task::where('creator_id', $user->id)->get(); 
+       $notifications = DB::table('notifications')
+       ->select('*')
+       ->where('group_id', $user->group_id)
+       ->orderBy( DB::raw('DATE(created_at)'), 'desc')
+       ->get();
         $data = [
             'tasks' => $tasks,
             'user' => $user,
+            "notifications"=>$notifications
         ];
 
         return Inertia::render('Tasks/Show', $data);
     }
     public function createTask(Request $request, Team $team)
     {
-
+        $user = Auth::user();
         $task = Task::create([
             'team_id' => $team->id,
             'creator_id' => Auth::user()->id,
+            'group_id'=>Auth::user()->group_id,
             'title' => $request->get('title'),
             'description' => $request->get('description'),
+        ]);
+
+        Notifications::forceCreate([
+            'user_id' => $user->id,
+            'group_id' => $user->group_id,
+            'type' => 'new_task',
+            'team_id' =>$team->id,
+            'configuration'=> json_encode(['icon' => 'mdi-check-circle-outline', 'color' => 'bg-success']),
+            'path' => '/tasks',
         ]);
 
         return response()
@@ -56,7 +74,6 @@ class TaskController extends Controller
         {
             $task->description = $data['description'];
         }
-
         $task->save();
 
         return response()

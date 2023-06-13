@@ -16,6 +16,7 @@ import RightSidebar from "./RightSidebar.vue";
 defineProps({
   title: String,
   user:Object,
+  notifications:Array
 });
 
 const showingNavigationDropdown = ref(false);
@@ -39,7 +40,7 @@ const logout = () => {
 
 <template>
   <!-- Topbar Start -->
-  <Navbar :user="user"/>
+  <Navbar :user="user" :notifications="notifications"/>
   <!-- end Topbar -->
 
   <!-- Start Content-->
@@ -51,7 +52,7 @@ const logout = () => {
         <div class="leftbar-user">
           <a href="javascript: void(0);">
             <img
-              :src="`storage/${user.profile_photo_path}`"
+              :src="`${user.profile_photo_path ? `storage/${user.profile_photo_path}` : user?.profile_photo_url }`"
               alt="user-image"
               height="42"
               class="rounded-circle h-40 w-40 object-cover ml-8"

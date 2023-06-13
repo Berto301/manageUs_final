@@ -12,6 +12,7 @@ const props = defineProps({
     user: Object,
     availableRoles: Array,
     permissions: Object,
+    notifications:Array
 });
 const state = reactive({
     modal_add_member: null,
@@ -187,7 +188,7 @@ function handlePhotoUpload(event) {
 }
 </style>
 <template>
-    <AppLayout title="Teams" :user="props.user">
+    <AppLayout title="Teams" :user="props.user"  :notifications="props?.notifications">
         <div class=" !bg-transparent mb-0 space-y-4" style="margin-top: 30px; padding: 30px 20px">
             <div class="card-header">
                 <div

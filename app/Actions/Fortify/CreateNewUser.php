@@ -6,6 +6,7 @@ use App\Models\Team;
 use App\Models\User;
 use App\Models\Role;
 use App\Models\Group;
+use App\Models\Notifications;
 use App\Models\Permissions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -45,9 +46,10 @@ class CreateNewUser implements CreatesNewUsers
                 'password' => Hash::make($input['password']),
                 'role' => $input['role'],
                 'group_id'=>$group->id
-            ]), function (User $user) {
+            ]), function (User $user) use ($group){
                 $this->createTeam($user);
                 $this->createPermissions($user);
+                $this->welcomeNotification($group);
             });
         });
     }
@@ -65,6 +67,7 @@ class CreateNewUser implements CreatesNewUsers
         
         $team = Team::forceCreate([
             'user_id' => $user->id,
+            'group_id'=>$user->group_id,
             'name' => explode(' ', $user->name, 2)[0]."'s Team",
             'personal_team' => true
         ]);
@@ -83,6 +86,16 @@ class CreateNewUser implements CreatesNewUsers
             'canDeleteTeam' => true,
         ]);
     }
-    
-
+    protected function welcomeNotification(Group $group)
+    {
+        
+        Notifications::forceCreate([
+            'user_id' => NULL,
+            'team_id' => NULL,
+            'configuration'=> json_encode(['icon' => 'mdi-poll', 'color' => 'bg-success']),
+            'group_id' => $group->id,
+            'type' => 'welcome',
+            'path' => '/dashboard',
+        ]);
+    }
 }

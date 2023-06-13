@@ -2,8 +2,11 @@
 import { Inertia } from "@inertiajs/inertia";
 import { Link } from "@inertiajs/inertia-vue3";
 import Logo from "../Components/Logo.vue";
+import { formatDistanceToNow } from 'date-fns';
+import {NOTIFICATIONS_MESSAGE} from "../helpers/_constants"
 defineProps({
     user: Object,
+    notifications:Array
 });
 
 const logout = () => {
@@ -89,7 +92,7 @@ const showMyProfile = () => Inertia.get(route("myProfile"));
                                         href="javascript: void(0);"
                                         class="text-dark"
                                     >
-                                        <small>Clear All</small>
+                                        <small>Close</small>
                                     </a> </span
                                 >Notification
                             </h5>
@@ -100,24 +103,23 @@ const showMyProfile = () => Inertia.get(route("myProfile"));
                             style="max-height: 300px"
                             data-simplebar
                         >
-                            <h5 class="text-muted font-13 fw-normal mt-0">
-                                Today
-                            </h5>
-                            <!-- item-->
+                            
                             <a
                                 href="javascript:void(0);"
                                 class="dropdown-item p-0 notify-item card unread-noti shadow-none mb-2"
+                                v-for="_notification in notifications" :key="_notification.id"
+                                :id="_notification.id"
                             >
                                 <div class="card-body">
                                     <span
                                         class="float-end noti-close-btn text-muted"
-                                        ><i class="mdi mdi-close"></i
+                                        ><i :class="`mdi md-close `"></i
                                     ></span>
                                     <div class="d-flex align-items-center">
                                         <div class="flex-shrink-0">
-                                            <div class="notify-icon bg-primary">
+                                            <div :class="`notify-icon ${JSON.parse(_notification.configuration)?.color}`">
                                                 <i
-                                                    class="mdi mdi-comment-account-outline"
+                                                    :class="`mdi ${JSON.parse(_notification.configuration)?.icon}`"
                                                 ></i>
                                             </div>
                                         </div>
@@ -127,184 +129,22 @@ const showMyProfile = () => Inertia.get(route("myProfile"));
                                             <h5
                                                 class="noti-item-title fw-semibold font-14"
                                             >
-                                                Datacorp
+                                                {{ NOTIFICATIONS_MESSAGE.find((_item)=>_item.key ===_notification?.type )?.title }}
                                                 <small
                                                     class="fw-normal text-muted ms-1"
-                                                    >1 min ago</small
+                                                    >{{ formatDistanceToNow(new Date(_notification?.created_at),{ addSuffix: true, locale: enGB }) }}</small
                                                 >
                                             </h5>
                                             <small
                                                 class="noti-item-subtitle text-muted"
-                                                >Caleb Flakelar commented on
-                                                Admin</small
+                                                >{{ NOTIFICATIONS_MESSAGE.find((_item)=>_item.key ===_notification?.type )?.description }}</small
                                             >
                                         </div>
                                     </div>
                                 </div>
                             </a>
 
-                            <!-- item-->
-                            <a
-                                href="javascript:void(0);"
-                                class="dropdown-item p-0 notify-item card read-noti shadow-none mb-2"
-                            >
-                                <div class="card-body">
-                                    <span
-                                        class="float-end noti-close-btn text-muted"
-                                        ><i class="mdi mdi-close"></i
-                                    ></span>
-                                    <div class="d-flex align-items-center">
-                                        <div class="flex-shrink-0">
-                                            <div class="notify-icon bg-info">
-                                                <i
-                                                    class="mdi mdi-account-plus"
-                                                ></i>
-                                            </div>
-                                        </div>
-                                        <div
-                                            class="flex-grow-1 text-truncate ms-2"
-                                        >
-                                            <h5
-                                                class="noti-item-title fw-semibold font-14"
-                                            >
-                                                Admin
-                                                <small
-                                                    class="fw-normal text-muted ms-1"
-                                                    >1 hours ago</small
-                                                >
-                                            </h5>
-                                            <small
-                                                class="noti-item-subtitle text-muted"
-                                                >New user registered</small
-                                            >
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-
-                            <h5 class="text-muted font-13 fw-normal mt-0">
-                                Yesterday
-                            </h5>
-
-                            <!-- item-->
-                            <a
-                                href="javascript:void(0);"
-                                class="dropdown-item p-0 notify-item card read-noti shadow-none mb-2"
-                            >
-                                <div class="card-body">
-                                    <span
-                                        class="float-end noti-close-btn text-muted"
-                                        ><i class="mdi mdi-close"></i
-                                    ></span>
-                                    <div class="d-flex align-items-center">
-                                        <div class="flex-shrink-0">
-                                            <div class="notify-icon">
-                                                <img
-                                                    src="assets/images/users/avatar-2.jpg"
-                                                    class="img-fluid rounded-circle"
-                                                    alt=""
-                                                />
-                                            </div>
-                                        </div>
-                                        <div
-                                            class="flex-grow-1 text-truncate ms-2"
-                                        >
-                                            <h5
-                                                class="noti-item-title fw-semibold font-14"
-                                            >
-                                                Cristina Pride
-                                                <small
-                                                    class="fw-normal text-muted ms-1"
-                                                    >1 day ago</small
-                                                >
-                                            </h5>
-                                            <small
-                                                class="noti-item-subtitle text-muted"
-                                                >Hi, How are you? What about our
-                                                next meeting</small
-                                            >
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-
-                            <h5 class="text-muted font-13 fw-normal mt-0">
-                                30 Dec 2021
-                            </h5>
-
-                            <!-- item-->
-                            <a
-                                href="javascript:void(0);"
-                                class="dropdown-item p-0 notify-item card read-noti shadow-none mb-2"
-                            >
-                                <div class="card-body">
-                                    <span
-                                        class="float-end noti-close-btn text-muted"
-                                        ><i class="mdi mdi-close"></i
-                                    ></span>
-                                    <div class="d-flex align-items-center">
-                                        <div class="flex-shrink-0">
-                                            <div class="notify-icon bg-primary">
-                                                <i
-                                                    class="mdi mdi-comment-account-outline"
-                                                ></i>
-                                            </div>
-                                        </div>
-                                        <div
-                                            class="flex-grow-1 text-truncate ms-2"
-                                        >
-                                            <h5
-                                                class="noti-item-title fw-semibold font-14"
-                                            >
-                                                Datacorp
-                                            </h5>
-                                            <small
-                                                class="noti-item-subtitle text-muted"
-                                                >Caleb Flakelar commented on
-                                                Admin</small
-                                            >
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-
-                            <!-- item-->
-                            <a
-                                href="javascript:void(0);"
-                                class="dropdown-item p-0 notify-item card read-noti shadow-none mb-2"
-                            >
-                                <div class="card-body">
-                                    <span
-                                        class="float-end noti-close-btn text-muted"
-                                        ><i class="mdi mdi-close"></i
-                                    ></span>
-                                    <div class="d-flex align-items-center">
-                                        <div class="flex-shrink-0">
-                                            <div class="notify-icon">
-                                                <img
-                                                    src="assets/images/users/avatar-4.jpg"
-                                                    class="img-fluid rounded-circle"
-                                                    alt=""
-                                                />
-                                            </div>
-                                        </div>
-                                        <div
-                                            class="flex-grow-1 text-truncate ms-2"
-                                        >
-                                            <h5
-                                                class="noti-item-title fw-semibold font-14"
-                                            >
-                                                Karen Robinson
-                                            </h5>
-                                            <small
-                                                class="noti-item-subtitle text-muted"
-                                                >Wow ! this admin looks good and
-                                                awesome design</small
-                                            >
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
+                           
 
                             <div class="text-center">
                                 <i
@@ -344,7 +184,7 @@ const showMyProfile = () => Inertia.get(route("myProfile"));
                     >
                         <span class="account-user-avatar">
                             <img
-                                :src="`storage/${user.profile_photo_path}`"
+                                :src="`${user.profile_photo_path ? `storage/${user.profile_photo_path}` : user?.profile_photo_url }`"
                                 alt="user-image"
                                 class="rounded-circle h-20 w-20 object-cover"
                             />

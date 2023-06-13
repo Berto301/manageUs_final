@@ -7,12 +7,14 @@ use App\Models\TeamInvitation;
 use App\Models\User;
 use App\Models\Role;
 use App\Models\Permissions;
+use App\Models\Notifications;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use App\Actions\Jetstream\DeleteTeam;
+use Illuminate\Support\Facades\DB;
 
 class TeamsController extends Controller
 {
@@ -22,12 +24,18 @@ class TeamsController extends Controller
        $user = Auth::user();
        $availableRoles = Role::all();
        $permissions = Permissions::where('user_id', $user->id)->firstOrFail();
+       $notifications = DB::table('notifications')
+       ->select('*')
+       ->where('group_id', $user->group_id)
+       ->orderBy( DB::raw('DATE(created_at)'), 'desc')
+       ->get();
     
         $data = [
             'teams' => $teams,
             'user' => $user,
             'availableRoles' => $availableRoles,
             'permissions' => $permissions,
+            "notifications"=>$notifications
         ];
 
         return Inertia::render('Teams/Lists', $data);
@@ -60,13 +68,21 @@ class TeamsController extends Controller
 
     public function create(Request $request)
     {
-
+        $user = Auth::user();
         $team = Team::forceCreate([
             'user_id' => Auth::user()->id,
+            'group_id'=>$user->group_id,
             'name' => $request->get('name'),
             'personal_team'=> $request->get('personal_team')
         ]);
-
+        Notifications::forceCreate([
+            'user_id' => NULL,
+            'group_id' => $user->group_id,
+            'type' => 'team_created',
+            'team_id' => $team->id,
+            'configuration'=> json_encode(['icon' => 'mdi-account-multiple-plus', 'color' => 'bg-primary']),
+            'path' => '/teams',
+        ]);
         return response()
             ->json([
                 'team' => $team,
@@ -82,6 +98,7 @@ class TeamsController extends Controller
             'name' => $data['name'],
             'personal_team' => $data['personal_team'],
             'user_id' => $data['user_id'] ?? Auth::user()->id,
+            'group_id'=>Auth::user()->group_id,
         ]);
 
         return response()->json([
@@ -110,13 +127,14 @@ class TeamsController extends Controller
 
     public function createMember(Request $request)
     {
-
+        $auth = Auth::user();
         $user = User::forceCreate([
             'name' => $request->get('name'),
             'email' => $request->get('email'),
             'password' => Hash::make($request->get('password')),
             'current_team_id'=>$request->get('current_team_id'),
-            'role'=>$request->get('role')
+            'role'=>$request->get('role'),
+            'group_id'=>$auth->group_id
         ]);
         if($user->id){
             Permissions::forceCreate([
@@ -125,7 +143,16 @@ class TeamsController extends Controller
                 'canRemoveTeamMembers' => $request->get('canRemoveTeamMembers'),
                 'canDeleteTeam' => $request->get('canDeleteTeam'),
             ]);
+            Notifications::forceCreate([
+                'user_id' => $user->id,
+                'group_id' => $auth->group_id,
+                'type' => 'new_member',
+                'team_id' => $request->get('current_team_id'),
+                'configuration'=> json_encode(['icon' => 'mdi-account-plus', 'color' => 'bg-info']),
+                'path' => '/teams',
+            ]);
         }
+        
         return response()
             ->json([
                 'user' => $user,

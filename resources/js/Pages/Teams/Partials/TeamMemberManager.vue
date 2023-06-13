@@ -34,6 +34,7 @@ const addTeamMemberForm = useForm({
     email: '',
     role: null,
 });
+console.log({roles:props?.availableRoles})
 const newMember = useForm({
     name:"",
     email:"",
