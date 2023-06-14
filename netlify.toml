@@ -1,0 +1,22 @@
+[build]
+  command = "npm run production"
+  publish = "public"
+
+[build.environment]
+  NODE_VERSION = "14.15.0"
+  PHP_VERSION = "8.2.6"
+
+[build.processing]
+  # Exclude unnecessary files from build
+  # Adjust this according to your project structure
+  exclude = [
+    "storage/**",
+    "tests/**",
+    "vendor/**",
+    ".env",
+    ".git/**",
+    "node_modules/**",
+  ]
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
