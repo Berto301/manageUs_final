@@ -1,5 +1,5 @@
 [build]
-  command = "npm run production"
+  command = "npm install && composer install && npm run production && ls"
   publish = "public"
 
 [build.environment]
